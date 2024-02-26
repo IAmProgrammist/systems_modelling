@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <iostream>
+#include <iomanip>
 
 #define PI 3.141592654
 #define g 9.81
@@ -8,7 +9,7 @@
 #define I 5.0
 #define R 1.0
 #define r 0.2
-#define m 100.0
+#define m 10.0
 #define e 0.0000000001
 #define es 0.00001
 
@@ -52,14 +53,19 @@ result newton(double P) {
     return (result) {angle, std::abs(getM(angle, P)) < es, P };   
 }
 
+double getY(double angle, double P) {
+    return (angle * PI * R) / 180.0 + (m * g + P) / k2;
+}
+
 int main() {
     double P = 0;
     double stepP = 100.0;
 
+    std::cout << std::setw(15) << "P" << "    " << std::setw(15) << "angle" << "    " << std::setw(15) << "Y" << std::endl;
     while (stepP > es) {
         result res = newton(-P);
         
-        std::cout << P << " " << res.angle << " " << res.succeed << std::endl;
+        std::cout << std::setw(15) << res.P << "    " << std::setw(15) << res.angle << "    " << std::setw(15) << getY(res.angle, res.P) << std::endl;
 
         if (res.angle > 0)
             P += stepP;
