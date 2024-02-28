@@ -10,47 +10,17 @@
 #define R 1.0
 #define r 0.2
 #define m 10.0
-#define e 0.0000000001
-#define es 0.00001
-
-
-double getM2(double P) {
-    return -(m * g + P) * R;
-}
-
-double getM1(double angle) {
-    return k1 * angle * PI * r * r / 180.0;
-}
-
-double getM(double angle, double P) {
-    return getM1(angle) + getM2(P);
-}
-
-double getDeriative(double angle, double P) {
-    return (getM(angle + e, P) - getM(angle, P)) / e;
-}
-
-double getDelta(double angle, double P) {
-    return getM(angle, P) / getDeriative(angle, P);
-}
+#define es 0.0000000001
 
 struct result {
     double angle;
-    bool succeed;
     double P;
 };
 
-result newton(double P) {
-    double angle = 0;
-    int c = 0;
-    double delta = getDelta(angle, P);
-    while (std::abs(getM(angle, P)) >= es && c < 100) {
-        c++;
-        angle -= delta;
-        delta = getDelta(angle, P);
-    }
+result getAngle(double P) {
+    double angle = (180.0 * R * (m * g + P)) / (PI * r * r);
 
-    return (result) {angle, std::abs(getM(angle, P)) < es, P };   
+    return (result) {angle, P };   
 }
 
 double getY(double angle, double P) {
@@ -63,7 +33,7 @@ int main() {
 
     std::cout << std::setw(15) << "P" << "    " << std::setw(15) << "angle" << "    " << std::setw(15) << "Y" << std::endl;
     while (stepP > es) {
-        result res = newton(-P);
+        result res = getAngle(-P);
         
         std::cout << std::setw(15) << res.P << "    " << std::setw(15) << res.angle << "    " << std::setw(15) << getY(res.angle, res.P) << std::endl;
 
