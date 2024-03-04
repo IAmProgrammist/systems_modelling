@@ -10,7 +10,7 @@
 #define R 1.0
 #define r 0.2
 #define m 10.0
-#define es 0.0000000001
+#define es 0.00001
 
 struct result {
     double angle;
@@ -18,7 +18,7 @@ struct result {
 };
 
 result getAngle(double P) {
-    double angle = (180.0 * R * (m * g + P)) / (PI * r * r);
+    double angle = (180.0 * R * (m * g + P)) / (PI * r * r * k1);
 
     return (result) {angle, P };   
 }
