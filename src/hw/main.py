@@ -27,7 +27,8 @@ def getdldx(x):
 def getlx(x):
     return L0 - a * math.fabs(x) if math.fabs(x) <= qDelta else 0
 
-#def getAngleAcc(angle, angleV, x, xV):
+# Нелианеризованная версия функции
+# def getAngleAcc(angle, angleV, x, xV):
 #    return (k2 * L * math.cos(angle) * (L * math.sin(angle) - x) + (g * L * m1 * math.cos(angle)) / 2) / -I
 
 def getAngleAcc(angle, angleV, x, xV):
@@ -36,8 +37,10 @@ def getAngleAcc(angle, angleV, x, xV):
 def getAngleVel(w):
     return w
 
+# Нелианеризованная версия функции
 #def getXAcc(x, xV, angle, angleV):
 #    return (k1 * x - k2 * (L * math.sin(angle) - x)) / -m2
+
 def getXAcc(x, xV, angle, angleV):
     return (k1 * x - k2 * (L * (angle) - x)) / -m2
 
@@ -48,7 +51,7 @@ def getQ1V(Q1, I2):
     return (E + I2 * R1 - Q1/C2) / (R2 + R1)
 
 def getQ2Acc(I1, I2, Q2, x, xV):
-    return (Q2 / C1 + getdldx(x) * xV * (I0 + I2) + (I2 + I1) * R1) / (-getlx(x))
+    return (Q2 / C1 + getdldx(x) * xV * (I0 + I2) + (I2 - I1) * R1) / (-getlx(x))
 
 def getQ2V(I2):
     return I2
@@ -62,9 +65,10 @@ I1_plot = list([0.0])
 Q1_plot = list([0.0])
 I2_plot = list([0.0])
 Q2_plot = list([0.0])
+U_plot = list([0.0])
 
 t = dt
-while t < 10:
+while t < 2:
     # Recalc I2V
     I2k1 = getQ2Acc(I1_plot[-1],          I2_plot[-1],                   Q2_plot[-1],          x_plot[-1],          xV_plot[-1])
     I2k2 = getQ2Acc(I1_plot[-1] + dt / 2, I2_plot[-1] + (dt / 2) * I2k1, Q2_plot[-1] + dt / 2, x_plot[-1] + dt / 2, xV_plot[-1] + dt / 2)
@@ -126,20 +130,33 @@ while t < 10:
     Q1_plot.append(Q1)
     I2_plot.append(I2)
     Q2_plot.append(Q2)
+    U_plot.append(I1 * R2)
     t += dt
 
+x_c_plot = x_c_plot[int(.1 / dt):]
+a_plot = a_plot[int(.1 / dt):]
+x_plot = x_plot[int(.1 / dt):]
+I1_plot = I1_plot[int(.1 / dt):]
+I2_plot = I2_plot[int(.1 / dt):]
+U_plot = U_plot[int(.1 / dt):]
+
 # Визуализация
-fig, (angle, y, I1_p, I2_p) = plt.subplots(4)
+
+fig, (angle, y, I1_p, I2_p, U_p) = plt.subplots(5)
 y.plot(x_c_plot, x_plot, 'r-', label='Отклонение')
 angle.plot(x_c_plot, a_plot, 'g-', label='Угол')
 I1_p.plot(x_c_plot, I1_plot, 'b-', label='I1')
-I2_p.plot(x_c_plot, Q2_plot, 'g-', label='I2')
+I2_p.plot(x_c_plot, I2_plot, 'r-', label='I2')
+U_p.plot(x_c_plot, U_plot, 'g-', label='U')
 y.set_title('Координата x')
 angle.set_title('Угол')
 I1_p.set_title('Ток I1')
 I2_p.set_title('Ток I2')
+U_p.set_title('Вольтметр')
 y.grid(True)
 angle.grid(True)
 I1_p.grid(True)
 I2_p.grid(True)
+U_p.grid(True)
 plt.show()
+
